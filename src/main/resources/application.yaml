@@ -2,9 +2,8 @@ spring:
   application:
     name: order-service
 
----
-spring:
-  profiles:
-    active: dev
-server:
-  port: 8083
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

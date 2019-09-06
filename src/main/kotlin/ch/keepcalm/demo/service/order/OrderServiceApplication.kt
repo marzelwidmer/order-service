@@ -1,10 +1,12 @@
 package ch.keepcalm.demo.service.order
 
-import io.jaegertracing.Configuration
 import io.jaegertracing.internal.samplers.ConstSampler
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.info.BuildProperties
+import org.springframework.boot.info.GitProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -15,6 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
+import springfox.documentation.builders.ApiInfoBuilder
+import springfox.documentation.builders.RequestHandlerSelectors
+import springfox.documentation.service.ApiInfo
+import springfox.documentation.service.Contact
+import springfox.documentation.spi.DocumentationType
+import springfox.documentation.spring.web.plugins.Docket
+import springfox.documentation.swagger2.annotations.EnableSwagger2
+import java.util.*
 
 @SpringBootApplication
 class OrderServiceApplication
@@ -53,12 +63,12 @@ class CatalogServiceClient(private val webClientBuilder: WebClient.Builder) {
 class TracerConfiguration {
 
     @Bean
-    fun jaegerTracer() = Configuration("order-service")
-            .withSampler(Configuration.SamplerConfiguration
+    fun jaegerTracer() = io.jaegertracing.Configuration("order-service")
+            .withSampler(io.jaegertracing.Configuration.SamplerConfiguration
                     .fromEnv()
                     .withType(ConstSampler.TYPE)
                     .withParam(1))
-            .withReporter(Configuration.ReporterConfiguration
+            .withReporter(io.jaegertracing.Configuration.ReporterConfiguration
                     .fromEnv()
                     .withLogSpans(true))
 }
@@ -68,5 +78,48 @@ class OrderServiceConfiguration {
 
     @Bean
     fun webClientBuilder() = WebClient.builder()
+
+}
+
+
+@Configuration
+@EnableSwagger2
+class SwaggerConfig(var build: Optional<BuildProperties>, var git: Optional<GitProperties>) {
+
+    @Bean
+    fun api(): Docket {
+        var version = "1.0"
+        // // TODO [marcelwidmer-06.09.19]: Refactor me
+        if (build.isPresent && git.isPresent) {
+            var buildInfo = build.get()
+            var gitInfo = git.get()
+            version = "${buildInfo.version}-${gitInfo.shortCommitId}-${gitInfo.branch}"
+        } else {
+            if (build.isPresent) {
+                var buildInfo = build.get()
+                version = "${buildInfo.version}"
+            }
+        }
+        return Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo(version))
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths { it.equals("/api/v1/orders/random") }
+                .build()
+                .useDefaultResponseMessages(false)
+                .forCodeGeneration(true)
+    }
+
+
+    private fun apiInfo(version: String): ApiInfo {
+        return ApiInfoBuilder()
+                .title("Spring Boot REST API")
+                .description("Order Management REST API")
+                .contact(Contact("Marcel Widmer", "https://github.com/marzelwidmer", "marzelwidmer@gmail.com"))
+                .license("Apache 2.0")
+                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                .version(version)
+                .build()
+    }
 
 }
