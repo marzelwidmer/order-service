@@ -50,7 +50,7 @@ class CatalogServiceClient(private val webClientBuilder: WebClient.Builder) {
 
     fun getRandomAnimalNames(): Flux<String> { // DEV - http://localhost:8081
         return this.webClientBuilder
-                .baseUrl("http://cataloge-service:8080/api/v1/animals/random").build()
+                .baseUrl("http://catalog-service:8080/api/v1/animals/random").build()
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve().bodyToFlux(String::class.java)
