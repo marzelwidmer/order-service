@@ -19,7 +19,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.RequestHandlerSelectors
-import springfox.documentation.service.ApiInfo
 import springfox.documentation.service.Contact
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
@@ -88,20 +87,22 @@ class SwaggerConfig(var build: Optional<BuildProperties>, var git: Optional<GitP
 
     @Bean
     fun api(): Docket {
-        var version = "1.0"
-        // // TODO [marcelwidmer-06.09.19]: Refactor me
-        if (build.isPresent && git.isPresent) {
-            var buildInfo = build.get()
-            var gitInfo = git.get()
-            version = "${buildInfo.version}-${gitInfo.shortCommitId}-${gitInfo.branch}"
-        } else {
-            if (build.isPresent) {
-                var buildInfo = build.get()
-                version = "${buildInfo.version}"
-            }
-        }
         return Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo(version))
+                .apiInfo(
+                        ApiInfoBuilder()
+                                .title("Spring Boot REST API")
+                                .description("Order Service REST API")
+                                .contact(Contact("Marcel Widmer", "https://github.com/marzelwidmer", "marzelwidmer@gmail.com"))
+                                .license("Apache 2.0")
+                                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                                .version(
+                                        when {
+                                            (build.isPresent && git.isPresent) -> "${build.get().version}-${git.get().shortCommitId}-${git.get().branch}"
+                                            else -> "1.0"
+                                        }
+                                )
+                                .build()
+                )
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths { it.equals("/api/v1/orders/random") }
@@ -109,17 +110,4 @@ class SwaggerConfig(var build: Optional<BuildProperties>, var git: Optional<GitP
                 .useDefaultResponseMessages(false)
                 .forCodeGeneration(true)
     }
-
-
-    private fun apiInfo(version: String): ApiInfo {
-        return ApiInfoBuilder()
-                .title("Spring Boot REST API")
-                .description("Order Management REST API")
-                .contact(Contact("Marcel Widmer", "https://github.com/marzelwidmer", "marzelwidmer@gmail.com"))
-                .license("Apache 2.0")
-                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-                .version(version)
-                .build()
-    }
-
 }
