@@ -21,6 +21,7 @@
 		<docker-registery>marzelwidmer</docker-registery>
 		<jaeger.version>2.0.3</jaeger.version>
 		<swagger.version>2.9.2</swagger.version>
+		<fabric8.maven.plugin.version>4.2.0</fabric8.maven.plugin.version>
 	</properties>
 
 	<dependencies>
@@ -119,6 +120,22 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
+			</plugin>
+
+			<!-- Fabric8 -->
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>fabric8-maven-plugin</artifactId>
+				<version>${fabric8.maven.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>fmp</id>
+						<goals>
+							<goal>resource</goal>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!-- Jib -->
