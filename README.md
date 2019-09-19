@@ -49,4 +49,34 @@ for x in (seq 20); http ":8080/api/v1/orders/random"; end
 ```
 
 
-oc create configmap foo --from-file=configure-pod-container/configmap/game.properties
+# ConfigMap
+Apply `ConfigMap`
+```bash
+$ oc apply -f deployments/configmap.yaml
+```
+
+Create `ConfigMap` from file.
+```bash
+$ oc create configmap order-service --from-file=src/main/resources/application.yaml
+```
+
+Get all `ConfigMaps`
+```bash
+$ oc get configmaps
+```
+
+Get `ConfigMap` as `yaml`
+```bash
+$ oc get configmap order-service -o yaml
+```
+
+Describe `ConfigMap`
+```bash
+$ oc describe configmap order-service
+```
+
+Delete `ConfigMap`
+```bash
+$ oc delete configmap order-service
+```
+
