@@ -49,6 +49,56 @@ for x in (seq 20); http ":8080/api/v1/orders/random"; end
 ```
 
 
+
+# Kubernetes ConfigMap
+
+## Add Maven `spring-cloud-dependencies` dependency management  
+```xml
+<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+```
+
+## Add `spring-cloud.version` properties.
+```xml
+<properties>
+		...
+		<spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+	</properties>
+```
+
+## Add Maven dependency `spring-cloud-starter-kubernetes-config` 
+```xml
+		<!-- Kubernetes -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-kubernetes-config</artifactId>
+		</dependency>
+```
+
+## Update RBAC policy
+```bash
+$ oc policy add-role-to-user view system:serviceaccount:development:default
+```
+
+Otherwise we get a exception like :
+```bash
+.fabric8.kubernetes.client.KubernetesClientException: 
+Failure executing: GET at: https://172.30.0.1/api/v1/namespaces/development/pods/order-service-35-wj25f. 
+    Message: Forbidden!Configured service account doesn't have access. 
+    Service account may have been revoked. pods "order-service-35-wj25f" is 
+        forbidden: User "system:serviceaccount:development:default" cannot get pods in the namespace "development": no RBAC policy matched.
+```
+
+
 # ConfigMap
 Apply `ConfigMap`
 ```bash
