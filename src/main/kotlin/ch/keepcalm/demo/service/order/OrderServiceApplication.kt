@@ -32,7 +32,6 @@ fun main(args: Array<String>) {
     runApplication<OrderServiceApplication>(*args)
 }
 
-
 @RestController
 @RequestMapping("/api/v1/orders")
 class OrderServiceResource(private val catalogServiceClient: CatalogServiceClient) {
@@ -62,7 +61,7 @@ class CatalogServiceClient(private val webClientBuilder: WebClient.Builder) {
 class TracerConfiguration {
 
     @Bean
-    fun jaegerTracer() = io.jaegertracing.Configuration("order-service")
+    fun jaegerTracer(): io.jaegertracing.Configuration = io.jaegertracing.Configuration("order-service")
             .withSampler(io.jaegertracing.Configuration.SamplerConfiguration
                     .fromEnv()
                     .withType(ConstSampler.TYPE)
@@ -79,7 +78,6 @@ class OrderServiceConfiguration {
     fun webClientBuilder() = WebClient.builder()
 
 }
-
 
 @Configuration
 @EnableSwagger2
