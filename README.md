@@ -1,51 +1,52 @@
 # Docker Build
 
 ```
-mvn clean install jib:dockerBuild 
+mvn clean install jib:dockerBuild
+```
+```
+docker run --name order-service -p 8080:8080 -d marzelwidmer/order-service:latest
 ```
 
-# API - dev 
+# API 
 ``` 
-http :8083
+http :8080/api/v1/scientists/random
+```
+# API - Dev
+``` 
+http :8080/api/v1/scientists/random
 ```
 
-# Jaeger
-[java-spring-jaeger](https://github.com/opentracing-contrib/java-spring-jaeger/blob/master/README.md)
+# Jager
 
-## Create Jaeger Project
-```bash
-$ oc new-project jaeger --display-name="Distributed Tracing System" 
+[Jeager UI ](http://localhost:16686/search)
+
+## Initial run
+```
+docker run -d --name jaeger \                                                                                                                                
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:1.8
 ```
 
-## Install Jaeger
-Install Jaeger on OpenShift to collect the traces
-```bash
-$ oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc create -f -
+## Stop Jaeger
+```
+docker stop jaeger 
+```
+## Start Jaeger
+```
+docker start jaeger 
 ```
 
-## Create Route
-Create a route to access the Jaeger collector
-```bash
-$ oc expose service jaeger-collector --port=14268 -n jaeger
+## Hit the Service
+``` 
+for x in (seq 20); http ":8080/api/v1/orders/random"; end
 ```
 
-## Get Route Host
-Get the route address
-```bash
-$ oc get route/jaeger-collector -n jaeger -o json | jq '.spec.host'
-```
 
-## Update Spring Configuration
-
-```yaml
-opentracing:
-  jaeger:
-    log-spans: true
-    http-sender:
-      url: http://jaeger-collector-jaeger.apps.c3smonkey.ch/api/traces
-```
-
-## Jaeger UI
-[Jaeger UI](https://jaeger-query-jaeger.apps.c3smonkey.ch/search)
-
-
+oc create configmap foo --from-file=configure-pod-container/configmap/game.properties
