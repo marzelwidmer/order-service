@@ -50,7 +50,7 @@ for x in (seq 20); http ":8080/api/v1/orders/random"; end
 
 
 
-# Kubernetes ConfigMap
+# Kubernetes ConfigMap Support
 
 ## Add Maven `spring-cloud-dependencies` dependency management  
 ```xml
@@ -89,7 +89,7 @@ for x in (seq 20); http ":8080/api/v1/orders/random"; end
 $ oc policy add-role-to-user view system:serviceaccount:development:default
 ```
 
-Otherwise we get a exception like :
+To avoid the following exception.
 ```bash
 .fabric8.kubernetes.client.KubernetesClientException: 
 Failure executing: GET at: https://172.30.0.1/api/v1/namespaces/development/pods/order-service-35-wj25f. 
@@ -105,6 +105,7 @@ Apply `ConfigMap`
 $ oc apply -f deployments/configmap.yaml
 ```
 
+## Additional ConfigMap Commands
 Create `ConfigMap` from file.
 ```bash
 $ oc create configmap order-service --from-file=src/main/resources/application.yaml
@@ -130,3 +131,12 @@ Delete `ConfigMap`
 $ oc delete configmap order-service
 ```
 
+# Wat running POD
+```bash
+$ watch oc get pods --field-selector=status.phase=Running                                                                         28.6m  Thu Sep 19 16:14:40 2019
+```
+
+# Tail logfile
+```bash
+$ oc logs -f order-service-37-hh2tb
+```
