@@ -9,7 +9,6 @@ mvn clean install jib:dockerBuild
 http :8083
 ```
 
-
 # Jaeger
 [java-spring-jaeger](https://github.com/opentracing-contrib/java-spring-jaeger/blob/master/README.md)
 
@@ -45,4 +44,8 @@ opentracing:
     http-sender:
       url: http://jaeger-collector-jaeger.apps.c3smonkey.ch/api/traces
 ```
+
+## Jaeger UI
+[Jaeger UI](https://jaeger-query-jaeger.apps.c3smonkey.ch/search)
+
 
