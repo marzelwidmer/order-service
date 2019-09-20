@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.info.BuildProperties
 import org.springframework.boot.info.GitProperties
 import org.springframework.boot.runApplication
+import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient
+import org.springframework.cloud.client.loadbalancer.LoadBalanced
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
@@ -25,6 +28,7 @@ import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
 import java.util.*
 
+@EnableDiscoveryClient
 @SpringBootApplication
 class OrderServiceApplication
 
@@ -36,7 +40,6 @@ fun main(args: Array<String>) {
 @RequestMapping("/api/v1/orders")
 class OrderServiceResource(private val catalogServiceClient: CatalogServiceClient) {
 
-
     @GetMapping(path = ["/random"])
     fun getAnimalNames(@RequestHeader headers: HttpHeaders): Flux<String> {
         return catalogServiceClient.getRandomAnimalNames()
@@ -44,12 +47,17 @@ class OrderServiceResource(private val catalogServiceClient: CatalogServiceClien
 
 }
 
+
 @Service
 class CatalogServiceClient(private val webClientBuilder: WebClient.Builder) {
 
-    fun getRandomAnimalNames(): Flux<String> { // DEV - http://localhost:8081
+    companion object {
+        val CATALOG_SERVICE_URL = "http://catalog-service/api/v1/animals/random"
+    }
+
+    fun getRandomAnimalNames(): Flux<String> {
         return this.webClientBuilder
-                .baseUrl("http://catalog-service:8080/api/v1/animals/random").build()
+                .baseUrl(CATALOG_SERVICE_URL).build()
                 .get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve().bodyToFlux(String::class.java)
@@ -75,7 +83,13 @@ class TracerConfiguration {
 class OrderServiceConfiguration {
 
     @Bean
+    @LoadBalanced
     fun webClientBuilder() = WebClient.builder()
+
+    @Bean
+    @LoadBalanced
+    fun restTemplate() = RestTemplateBuilder().build()
+
 
 }
 
