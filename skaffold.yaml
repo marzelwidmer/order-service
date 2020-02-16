@@ -3,6 +3,8 @@ kind: Config
 metadata:
   name: order-service
 build:
+  tagPolicy:
+    sha256: {}
   artifacts:
     - image: order-service
       jib: {}

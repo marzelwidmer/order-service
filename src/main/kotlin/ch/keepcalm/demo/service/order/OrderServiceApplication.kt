@@ -36,6 +36,13 @@ fun main(args: Array<String>) {
     GracefulshutdownSpringApplication.run(OrderServiceApplication::class.java, *args)
 }
 
+
+@RestController
+class LivenessProbe  {
+    @GetMapping(value = ["/alive"])
+    fun alive() = "ok"
+}
+
 @RestController
 @RequestMapping("/api/v1/orders")
 class OrderServiceResource(private val catalogServiceClient: CatalogServiceClient) {
