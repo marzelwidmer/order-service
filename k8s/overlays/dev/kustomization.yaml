@@ -18,3 +18,9 @@ resources:
 - ../../base/
 - route.yaml
 
+
+configMapGenerator:
+  - name: order-service-configmap
+    behavior: merge
+    files:
+      - application.yaml
