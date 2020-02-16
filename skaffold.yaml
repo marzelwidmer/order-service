@@ -21,7 +21,7 @@ profiles:
       artifacts:
         - image: registry.apps.c3smonkey.ch/dev/order-service
           jib:
-            args: ['-DskipTests' , '-Dimage=registry.apps.c3smonkey.ch/dev/order-service']
+            args: ['-Dimage=registry.apps.c3smonkey.ch/dev/order-service']
 
     deploy:
       kubectl:
