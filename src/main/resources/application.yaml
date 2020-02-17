@@ -26,3 +26,4 @@ ribbon:
   http:
     client:
       enabled: true
+
