@@ -28,9 +28,10 @@ spec:
             httpGet:
               port: 8080
               path: /actuator/health
-          env:
-            - name: "APPLICATION_CONFIGURATION"
-              valueFrom:
-                configMapKeyRef:
-                  name: order-service-configmap
-                  key: application.yaml
+          volumeMounts:
+            - name: order-service
+              mountPath: /config
+      volumes:
+        - name: "order-service"
+          configMap:
+            name: "order-service-configmap"
